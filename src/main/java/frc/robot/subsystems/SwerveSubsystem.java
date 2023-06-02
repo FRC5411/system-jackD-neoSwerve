@@ -42,7 +42,7 @@ public class SwerveSubsystem extends SubsystemBase {
          * NOTE: Swerve Odometry now requires you to pass in the
          * poses of the modules; So I made this array to store the
          * positions and getPositions() to return the poses and update
-         * them periodically.
+         * them periodically. Might have to fix this.
          */
         swerveModPoses = new SwerveModulePosition[] {
             new SwerveModulePosition(swerveMods[0].getDriveEncoderPosition(), 
