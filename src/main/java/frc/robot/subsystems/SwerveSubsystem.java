@@ -55,11 +55,11 @@ public class SwerveSubsystem extends SubsystemBase {
                 swerveMods[3].getAngle())
         };
 
-        swerveOdometry = new SwerveDriveOdometry(Swerve.swerveKinematics, getYaw(), swerveModPoses);
-
         gyro = new Pigeon2(Swerve.pigeonID);
         gyro.configFactoryDefault();
         zeroGyro();
+
+        swerveOdometry = new SwerveDriveOdometry(Swerve.swerveKinematics, getYaw(), swerveModPoses);
 
         field = new Field2d();
         SmartDashboard.putData("Field", field);

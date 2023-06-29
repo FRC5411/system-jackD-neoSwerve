@@ -35,30 +35,35 @@ public class SwerveModule {
 
     private final SimpleMotorFeedforward feedForward;
 
+    private SwerveModuleState desiredState;
+
     public SwerveModule(int moduleID, SwerveModuleConstraints moduleConstants) {
         this.moduleID = moduleID;
-        lastAngle = getState().angle;
         angleOffset = moduleConstants.angleOffset;
 
         driveMotor = new CANSparkMax(moduleConstants.driveMotorID, 
             MotorType.kBrushless);
+        driveEncoder = driveMotor.getEncoder();
+        driveController = driveMotor.getPIDController();
         configureDriveMotor();
 
         azimuthMotor = new CANSparkMax(moduleConstants.azimutMotorID, 
             MotorType.kBrushless);
+        azimuthEncoder = azimuthMotor.getEncoder();
+        azimuthController = azimuthMotor.getPIDController();
         configureAzimuthMotor();
 
-        driveEncoder = driveMotor.getEncoder();
-        azimuthEncoder = azimuthMotor.getEncoder();
+
         angleEncoder = new CANCoder(moduleConstants.cancoderID);
-        configureAngleEncoder();
+//        configureAngleEncoder();
         
-        driveController = driveMotor.getPIDController();
-        azimuthController = azimuthMotor.getPIDController(); // new PIDController(0.0, 0.0, 0.0); // NOTE: put these in constants.
+ // new PIDController(0.0, 0.0, 0.0); // NOTE: put these in constants.
         
         feedForward = new SimpleMotorFeedforward(Swerve.driveKS, 
             Swerve.driveKV, 
             Swerve.driveKA);
+
+        lastAngle = getState().angle;
     }
 
     private void configureDriveMotor() {
@@ -78,6 +83,8 @@ public class SwerveModule {
         driveController.setI(Swerve.driveKI);
         driveController.setD(Swerve.driveKD);
         driveController.setFF(Swerve.driveKFF);
+
+        driveController.setFeedbackDevice(driveEncoder);
 
         driveMotor.burnFlash();
     }
@@ -99,9 +106,11 @@ public class SwerveModule {
         azimuthController.setD(Swerve.angleKD);
         azimuthController.setFF(Swerve.angleKFF);
 
+        azimuthController.setFeedbackDevice(azimuthEncoder);
+
         azimuthMotor.burnFlash();
 
-        resetToAbsolute();
+//        resetToAbsolute();
     }
 
     private void configureAngleEncoder() {
@@ -159,6 +168,10 @@ public class SwerveModule {
 
     public SwerveModuleState getState() {
         return new SwerveModuleState(driveEncoder.getVelocity(), getAngle());
+    }
+
+    public SwerveModuleState getDesiredState() {
+        return
     }
 
     public double getDriveEncoderPosition() {
