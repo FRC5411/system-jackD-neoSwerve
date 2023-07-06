@@ -1,7 +1,9 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -35,30 +37,36 @@ public class SwerveModule {
 
     private final SimpleMotorFeedforward feedForward;
 
+    private final CANCoderConfiguration swerveCanCoderConfig;
+
     public SwerveModule(int moduleID, SwerveModuleConstraints moduleConstants) {
         this.moduleID = moduleID;
-        lastAngle = getState().angle;
         angleOffset = moduleConstants.angleOffset;
+        swerveCanCoderConfig = new CANCoderConfiguration();
+
+        // swerveCanCoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+        // swerveCanCoderConfig.sensorDirection
 
         driveMotor = new CANSparkMax(moduleConstants.driveMotorID, 
             MotorType.kBrushless);
+        driveEncoder = driveMotor.getEncoder();
+        driveController = driveMotor.getPIDController();
         configureDriveMotor();
 
         azimuthMotor = new CANSparkMax(moduleConstants.azimutMotorID, 
             MotorType.kBrushless);
-        configureAzimuthMotor();
-
-        driveEncoder = driveMotor.getEncoder();
         azimuthEncoder = azimuthMotor.getEncoder();
+        azimuthController = azimuthMotor.getPIDController();
+        configureAzimuthMotor();
+        
         angleEncoder = new CANCoder(moduleConstants.cancoderID);
         configureAngleEncoder();
-        
-        driveController = driveMotor.getPIDController();
-        azimuthController = azimuthMotor.getPIDController(); // new PIDController(0.0, 0.0, 0.0); // NOTE: put these in constants.
         
         feedForward = new SimpleMotorFeedforward(Swerve.driveKS, 
             Swerve.driveKV, 
             Swerve.driveKA);
+
+        lastAngle = getState().angle;
     }
 
     private void configureDriveMotor() {
@@ -78,6 +86,8 @@ public class SwerveModule {
         driveController.setI(Swerve.driveKI);
         driveController.setD(Swerve.driveKD);
         driveController.setFF(Swerve.driveKFF);
+
+        driveController.setFeedbackDevice(driveEncoder);
 
         driveMotor.burnFlash();
     }
@@ -99,15 +109,15 @@ public class SwerveModule {
         azimuthController.setD(Swerve.angleKD);
         azimuthController.setFF(Swerve.angleKFF);
 
-        azimuthMotor.burnFlash();
+        azimuthController.setFeedbackDevice(azimuthEncoder);
 
-        resetToAbsolute();
+        azimuthMotor.burnFlash();
     }
 
     private void configureAngleEncoder() {
         angleEncoder.configFactoryDefault();
 
-        angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
+        // angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
     }
 
     private void resetToAbsolute() {
