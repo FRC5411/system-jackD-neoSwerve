@@ -142,7 +142,5 @@ public class SwerveSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Module " + mod.moduleID + " Velocity ", 
                 mod.getState().speedMetersPerSecond);
         }
-
-        SmartDashboard.putString("Swerve Module Angle", swerveMods[0].getState().angle.toString());
     }
 }

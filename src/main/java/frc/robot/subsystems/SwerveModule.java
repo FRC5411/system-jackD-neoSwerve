@@ -1,9 +1,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -15,7 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.libs.config.SwerveModuleConstraints;
 import frc.libs.math.OnboardModuleState;
-import frc.robot.Robot;
 import frc.robot.Constants.Swerve;
 
 public class SwerveModule {
@@ -37,15 +34,9 @@ public class SwerveModule {
 
     private final SimpleMotorFeedforward feedForward;
 
-    private final CANCoderConfiguration swerveCanCoderConfig;
-
     public SwerveModule(int moduleID, SwerveModuleConstraints moduleConstants) {
         this.moduleID = moduleID;
         angleOffset = moduleConstants.angleOffset;
-        swerveCanCoderConfig = new CANCoderConfiguration();
-
-        // swerveCanCoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-        // swerveCanCoderConfig.sensorDirection
 
         driveMotor = new CANSparkMax(moduleConstants.driveMotorID, 
             MotorType.kBrushless);
@@ -147,8 +138,20 @@ public class SwerveModule {
             (Math.abs(desiredState.speedMetersPerSecond) <= (Swerve.maxSpeed * 0.01)) // Prevent jittering
                 ? lastAngle 
                 : desiredState.angle;
+
+        /*
+         * Alright so basically, this extra block
+         * of code below does the job of doing the
+         * function 'enableContinuousInput'. The
+         * reason why you can't just call that
+         * method is because SparkMax is big dumb
+         */
+        double rawInput = angle.getDegrees(); 
+
+        // Map the input value to the -π to π range
+        double adjustedInput = Math.atan2(Math.sin(rawInput), Math.cos(rawInput));
         
-        azimuthController.setReference(angle.getDegrees(), ControlType.kPosition);
+        azimuthController.setReference(adjustedInput, ControlType.kPosition);
         lastAngle = angle;
     }
 
