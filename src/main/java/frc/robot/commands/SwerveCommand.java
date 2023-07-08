@@ -38,7 +38,7 @@ public class SwerveCommand extends CommandBase {
 
         translationLimiter = new SlewRateLimiter(3.0);
         strafeLimiter = new SlewRateLimiter(3.0);
-        rotationLimiter = new SlewRateLimiter(3.0);
+        rotationLimiter = new SlewRateLimiter(8.0);
 
         addRequirements(robotSwerve);
     }
@@ -60,5 +60,5 @@ public class SwerveCommand extends CommandBase {
             rotationVal * Swerve.maxAngularVelocity, 
             !robotCentricSup.getAsBoolean(), 
             true);
-    }
+    } 
 }

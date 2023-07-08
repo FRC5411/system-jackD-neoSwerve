@@ -11,7 +11,7 @@ import frc.libs.config.SwerveModuleConstraints;
 public final class Constants {
 
   public static final class Swerve {
-    public static final double stickDeadband = 0.1;
+    public static final double stickDeadband = 0.2;
 
     public static final int pigeonID = 1;
     public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
@@ -26,14 +26,14 @@ public final class Constants {
     public static final double closedLoopRamp = 0.0;
 
     public static final double driveGearRatio = (6.75 / 1.0); // 6.75:1
-    public static final double angleGearRatio = (12.8 / 1.0); // 12.8:1
+    public static final double angleGearRatio = (21.4 / 1.0); // 12.8:1
 
     public static final SwerveDriveKinematics swerveKinematics =
         new SwerveDriveKinematics(
-            new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
             new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
-            new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
-            new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
+            new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
+            new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0),
+            new Translation2d(-wheelBase / 2.0, trackWidth / 2.0));
 
     /* Swerve Voltage Compensation */
     public static final double voltageComp = 12.0;
@@ -86,7 +86,7 @@ public final class Constants {
       public static final int driveMotorID = 11;
       public static final int azimuthMotorID = 21;
       public static final int canCoderID = 31;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(181.055);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(39.29);
       public static final SwerveModuleConstraints constants =
           new SwerveModuleConstraints(driveMotorID, azimuthMotorID, canCoderID, angleOffset);
     }
@@ -96,7 +96,7 @@ public final class Constants {
       public static final int driveMotorID = 12;
       public static final int azimuthMotorID = 22;
       public static final int canCoderID = 32;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(102.568);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(113.91);
       public static final SwerveModuleConstraints constants =
           new SwerveModuleConstraints(driveMotorID, azimuthMotorID, canCoderID, angleOffset);
     }
@@ -106,7 +106,7 @@ public final class Constants {
       public static final int driveMotorID = 13;
       public static final int azimuthMotorID = 23;
       public static final int canCoderID = 33;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(100.371);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(8.61);
       public static final SwerveModuleConstraints constants =
           new SwerveModuleConstraints(driveMotorID, azimuthMotorID, canCoderID, angleOffset);
     }
@@ -116,7 +116,7 @@ public final class Constants {
       public static final int driveMotorID = 14;
       public static final int azimuthMotorID = 24;
       public static final int canCoderID = 34;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(86.221);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(358.42);
       public static final SwerveModuleConstraints constants =
           new SwerveModuleConstraints(driveMotorID, azimuthMotorID, canCoderID, angleOffset);
     }

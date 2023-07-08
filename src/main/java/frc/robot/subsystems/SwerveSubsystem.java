@@ -69,7 +69,7 @@ public class SwerveSubsystem extends SubsystemBase {
         boolean fieldRelative, boolean isOpenLoop) {
         
         SwerveModuleState[] swerveModuleStates = Swerve.swerveKinematics.toSwerveModuleStates(
-            fieldRelative 
+            fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(
                 translation.getX(), translation.getY(), rotation, getYaw())
             : new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
@@ -88,6 +88,16 @@ public class SwerveSubsystem extends SubsystemBase {
 
         for (SwerveModule mod : swerveMods) {
             mod.setDesiredState(desiredStates[mod.moduleID], false);
+        }
+    }
+
+    public void setModulesToZero() {
+        SwerveModuleState[] swerveModuleStates = Swerve.swerveKinematics.toSwerveModuleStates(
+            new ChassisSpeeds(0.0,0.0,0.0)
+        );
+
+        for (SwerveModule mod : swerveMods) {
+            mod.setDesiredState(swerveModuleStates[mod.moduleID], false);
         }
     }
 

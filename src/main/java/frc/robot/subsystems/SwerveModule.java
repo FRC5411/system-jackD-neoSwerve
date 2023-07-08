@@ -103,6 +103,8 @@ public class SwerveModule {
         azimuthController.setFeedbackDevice(azimuthEncoder);
 
         azimuthMotor.burnFlash();
+
+        //resetToAbsolute(); 
     }
 
     private void configureAngleEncoder() {
@@ -151,7 +153,7 @@ public class SwerveModule {
         // Map the input value to the -π to π range
         double adjustedInput = Math.atan2(Math.sin(rawInput), Math.cos(rawInput));
         
-        azimuthController.setReference(adjustedInput, ControlType.kPosition);
+        azimuthController.setReference(angle.getDegrees(), ControlType.kPosition);
         lastAngle = angle;
     }
 
