@@ -109,8 +109,6 @@ public class SwerveModule {
 
     private void configureAngleEncoder() {
         angleEncoder.configFactoryDefault();
-
-        // angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
     }
 
     private void resetToAbsolute() {
@@ -140,18 +138,6 @@ public class SwerveModule {
             (Math.abs(desiredState.speedMetersPerSecond) <= (Swerve.maxSpeed * 0.01)) // Prevent jittering
                 ? lastAngle 
                 : desiredState.angle;
-
-        /*
-         * Alright so basically, this extra block
-         * of code below does the job of doing the
-         * function 'enableContinuousInput'. The
-         * reason why you can't just call that
-         * method is because SparkMax is big dumb
-         */
-        double rawInput = angle.getDegrees(); 
-
-        // Map the input value to the -π to π range
-        double adjustedInput = Math.atan2(Math.sin(rawInput), Math.cos(rawInput));
         
         azimuthController.setReference(angle.getDegrees(), ControlType.kPosition);
         lastAngle = angle;

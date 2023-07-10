@@ -16,7 +16,6 @@ public class RobotContainer {
     private CommandXboxController controller;
     
     private Trigger zeroGyro;
-    private Trigger zeroModules;
     private Trigger robotCentric;
 
     public RobotContainer() {
@@ -25,7 +24,6 @@ public class RobotContainer {
         controller = new CommandXboxController(0);
 
         zeroGyro = controller.leftBumper();
-        zeroModules = controller.b();
         robotCentric = controller.rightBumper();
 
         robotSwerve.setDefaultCommand(new SwerveCommand(
@@ -42,11 +40,6 @@ public class RobotContainer {
     private void configureBindings() {
         zeroGyro.onTrue(new InstantCommand( () -> { 
             robotSwerve.zeroGyro(); 
-        }))
-        .onFalse(new InstantCommand());
-
-        zeroModules.onTrue(new InstantCommand( () -> {
-            robotSwerve.setModulesToZero();
         }))
         .onFalse(new InstantCommand());
     }

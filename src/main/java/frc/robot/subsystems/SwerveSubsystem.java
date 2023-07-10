@@ -38,12 +38,6 @@ public class SwerveSubsystem extends SubsystemBase {
                 Swerve.Mod3.constants)
         };
 
-        /*
-         * NOTE: Swerve Odometry now requires you to pass in the
-         * poses of the modules; So I made this array to store the
-         * positions and getPositions() to return the poses and update
-         * them periodically. Might have to fix this.
-         */
         swerveModPoses = new SwerveModulePosition[] {
             new SwerveModulePosition(swerveMods[0].getDriveEncoderPosition(), 
                 swerveMods[0].getAngle()),
@@ -70,13 +64,11 @@ public class SwerveSubsystem extends SubsystemBase {
         
         SwerveModuleState[] swerveModuleStates = Swerve.swerveKinematics.toSwerveModuleStates(
             fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                translation.getX(), translation.getY(), rotation, getYaw())
-            : new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
-        );
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                    translation.getX(), translation.getY(), rotation, getYaw())
+                : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, 
-            Swerve.maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Swerve.maxSpeed);
         
         for (SwerveModule mod : swerveMods) {
             mod.setDesiredState(swerveModuleStates[mod.moduleID], isOpenLoop);
@@ -88,16 +80,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
         for (SwerveModule mod : swerveMods) {
             mod.setDesiredState(desiredStates[mod.moduleID], false);
-        }
-    }
-
-    public void setModulesToZero() {
-        SwerveModuleState[] swerveModuleStates = Swerve.swerveKinematics.toSwerveModuleStates(
-            new ChassisSpeeds(0.0,0.0,0.0)
-        );
-
-        for (SwerveModule mod : swerveMods) {
-            mod.setDesiredState(swerveModuleStates[mod.moduleID], false);
         }
     }
 
@@ -143,6 +125,8 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         swerveOdometry.update(getYaw(), getPositions());
         field.setRobotPose(getPose());
+
+        SmartDashboard.putData(field);
 
         for (SwerveModule mod : swerveMods) {
             SmartDashboard.putNumber("Module " + mod.moduleID + " Cancoder ", 
