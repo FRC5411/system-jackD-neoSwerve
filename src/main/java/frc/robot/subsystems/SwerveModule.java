@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.libs.config.SwerveModuleConstraints;
 import frc.libs.math.OnboardModuleState;
-import frc.robot.Robot;
 import frc.robot.Constants.Swerve;
 
 public class SwerveModule {
@@ -39,9 +38,6 @@ public class SwerveModule {
         this.moduleID = moduleID;
         angleOffset = moduleConstants.angleOffset;
 
-        angleEncoder = new CANCoder(moduleConstants.cancoderID);
-        configureAngleEncoder();
-
         driveMotor = new CANSparkMax(moduleConstants.driveMotorID, 
             MotorType.kBrushless);
         driveEncoder = driveMotor.getEncoder();
@@ -53,6 +49,9 @@ public class SwerveModule {
         azimuthEncoder = azimuthMotor.getEncoder();
         azimuthController = azimuthMotor.getPIDController();
         configureAzimuthMotor();
+        
+        angleEncoder = new CANCoder(moduleConstants.cancoderID);
+        configureAngleEncoder();
         
         feedForward = new SimpleMotorFeedforward(Swerve.driveKS, 
             Swerve.driveKV, 
@@ -105,13 +104,11 @@ public class SwerveModule {
 
         azimuthMotor.burnFlash();
 
-        resetToAbsolute(); 
+        //resetToAbsolute(); 
     }
 
     private void configureAngleEncoder() {
         angleEncoder.configFactoryDefault();
-
-        angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
     }
 
     private void resetToAbsolute() {
