@@ -1,7 +1,24 @@
 {
   "NetworkTables": {
+    "retained": {
+      "SmartDashboard": {
+        "open": true
+      },
+      "limelight": {
+        "open": true
+      }
+    },
     "transitory": {
       "SmartDashboard": {
+        "0": {
+          "CANCODER": {
+            "open": true
+          },
+          "open": true
+        },
+        "1": {
+          "open": true
+        },
         "open": true
       }
     },

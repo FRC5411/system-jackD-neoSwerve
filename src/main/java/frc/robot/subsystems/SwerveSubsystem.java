@@ -57,6 +57,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
         field = new Field2d();
         SmartDashboard.putData("Field", field);
+
+        resetModules();
     }
 
     public void swerveDrive(Translation2d translation, double rotation, 
@@ -121,6 +123,12 @@ public class SwerveSubsystem extends SubsystemBase {
         return swerveModPoses;
     }
 
+    public void resetModules() {
+        for (SwerveModule mod : swerveMods) {
+            mod.resetToAbsolute();
+        }
+    } 
+
     @Override
     public void periodic() {
         swerveOdometry.update(getYaw(), getPositions());
@@ -132,9 +140,10 @@ public class SwerveSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Module " + mod.moduleID + " Cancoder ", 
                 mod.getCanCoder().getDegrees());
             SmartDashboard.putNumber("Module " + mod.moduleID + " Integrated ", 
-                mod.getState().angle.getDegrees());
+                mod.getState().angle.getDegrees() % 360);
             SmartDashboard.putNumber("Module " + mod.moduleID + " Velocity ", 
                 mod.getState().speedMetersPerSecond);
+            mod.canCoderTelemtry();
         }
     }
 }

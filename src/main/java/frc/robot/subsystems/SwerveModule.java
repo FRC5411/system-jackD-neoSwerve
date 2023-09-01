@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -11,10 +12,14 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.libs.config.SwerveModuleConstraints;
 import frc.libs.math.OnboardModuleState;
 import frc.robot.Robot;
 import frc.robot.Constants.Swerve;
+
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 public class SwerveModule {
 
@@ -40,7 +45,7 @@ public class SwerveModule {
         angleOffset = moduleConstants.angleOffset;
 
         angleEncoder = new CANCoder(moduleConstants.cancoderID);
-        configureAngleEncoder();
+        configPosition(angleEncoder, -moduleConstants.angleOffset.getDegrees());
 
         driveMotor = new CANSparkMax(moduleConstants.driveMotorID, 
             MotorType.kBrushless);
@@ -59,6 +64,9 @@ public class SwerveModule {
             Swerve.driveKA);
 
         lastAngle = getState().angle;
+
+        Timer.delay(1);
+        resetToAbsolute();
     }
 
     private void configureDriveMotor() {
@@ -108,16 +116,25 @@ public class SwerveModule {
         resetToAbsolute(); 
     }
 
-    private void configureAngleEncoder() {
-        angleEncoder.configFactoryDefault();
+    // private void configureAngleEncoder() {
+    //     angleEncoder.configFactoryDefault();
 
-        angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
-    }
+    //     angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
+    // }
 
-    private void resetToAbsolute() {
-        double absolutePosition = getCanCoder().getDegrees() - angleOffset.getDegrees();
+    private void configPosition (CANCoder encoder, double offset) {
+        encoder.configFactoryDefault();
+        encoder.configMagnetOffset(offset);
+        encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+        encoder.setPositionToAbsolute();
+        System.out.println(encoder.getDeviceID());
+      }
 
-        azimuthEncoder.setPosition(absolutePosition);
+    public void resetToAbsolute() {
+ //       double absolutePosition = getCanCoder().getDegrees(); //- angleOffset.getDegrees();
+
+        REVLibError error = azimuthEncoder.setPosition(angleEncoder.getAbsolutePosition());
+        SmartDashboard.putString(moduleID+"/RESET", error.toString());
     }
 
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -167,5 +184,13 @@ public class SwerveModule {
 
     public double getDriveEncoderPosition() {
         return driveEncoder.getPosition();
+    }
+
+    public void canCoderTelemtry() {
+
+        SmartDashboard.putNumber(moduleID + "/CANCODER/ABSPOS", angleEncoder.getAbsolutePosition());
+        SmartDashboard.putNumber(moduleID + "/CANCODER/POS", angleEncoder.getPosition());
+        SmartDashboard.putString(moduleID + "/CANCODER/Error", angleEncoder.getLastError().toString());
+
     }
 }

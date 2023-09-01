@@ -26,25 +26,29 @@ public class RobotContainer {
         zeroGyro = controller.leftBumper();
         robotCentric = controller.rightBumper();
 
-        robotSwerve.setDefaultCommand(new SwerveCommand(
-            robotSwerve, 
-            () -> controller.getLeftY(), 
-            () -> -controller.getLeftX(), 
-            () -> -controller.getRightX(), 
-            () -> robotCentric.getAsBoolean()
-        ));
+        // robotSwerve.setDefaultCommand(new SwerveCommand(
+        //     robotSwerve, 
+        //     () -> -controller.getLeftY(), 
+        //     () -> -controller.getLeftX(), 
+        //     () -> -controller.getRightX(), 
+        //     () -> robotCentric.getAsBoolean()
+        // ));
 
         configureBindings();
     }
 
     private void configureBindings() {
-        zeroGyro.onTrue(new InstantCommand( () -> { 
-            robotSwerve.zeroGyro(); 
+        controller.a().onTrue(new InstantCommand( () -> { 
+            robotSwerve.resetModules(); 
         }))
         .onFalse(new InstantCommand());
     }
 
     public Command getAutonomousCommand() {
         return null;
+    }
+
+    public SwerveSubsystem getDrive() {
+        return robotSwerve;
     }
 }
