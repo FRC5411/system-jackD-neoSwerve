@@ -173,6 +173,7 @@ public class SwerveSubsystem extends SubsystemBase {
         field.setRobotPose(getPose());
 
         SmartDashboard.putData(field);
+        
         for (SwerveModule mod : swerveMods) {
             mod.Telemtry();
         }
