@@ -11,12 +11,15 @@
     "transitory": {
       "SmartDashboard": {
         "0": {
-          "CANCODER": {
-            "open": true
-          },
           "open": true
         },
         "1": {
+          "open": true
+        },
+        "2": {
+          "open": true
+        },
+        "3": {
           "open": true
         },
         "open": true
