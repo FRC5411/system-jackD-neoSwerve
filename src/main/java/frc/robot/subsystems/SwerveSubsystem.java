@@ -1,7 +1,13 @@
-
 package frc.robot.subsystems;
 
+import java.util.HashMap;
+import java.util.List;
+
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Swerve;
 
@@ -85,7 +92,7 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
-    public void resetOdometry(Pose2d pose) {
+    public void resetPose(Pose2d pose) {
         swerveOdometry.resetPosition(getYaw(), swerveModPoses, pose);
     }
 
@@ -107,7 +114,7 @@ public class SwerveSubsystem extends SubsystemBase {
         SwerveModuleState[] states = new SwerveModuleState[4];
 
         for (SwerveModule mod : swerveMods) {
-            states[mod.moduleID] = mod.getState();
+            states[mod.moduleID] = mod.getActualState();
         }
 
         return states;
@@ -127,7 +134,38 @@ public class SwerveSubsystem extends SubsystemBase {
         for (SwerveModule mod : swerveMods) {
             mod.resetToAbsolute();
         }
-    } 
+    }
+
+    public ChassisSpeeds getChassisSpeeds() {
+        return Swerve.swerveKinematics.toChassisSpeeds(getStates());
+    }
+
+    public Command followPathGroup(HashMap<String, Command> eventMap, boolean useAlliance, String pathName) {
+        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(
+            pathName, 
+            PathPlanner.getConstraintsFromPath(pathName),
+            PathPlanner.getConstraintsFromPath(pathName)
+            );
+
+        PathPlannerTrajectory mapTrajectory = PathPlanner.loadPath(
+            pathName, 
+            PathPlanner.getConstraintsFromPath(pathName));
+        
+        field.getObject(pathName).setTrajectory(mapTrajectory);
+
+        SwerveAutoBuilder builder = new SwerveAutoBuilder(
+            this::getPose, 
+            this::resetPose, 
+            Swerve.swerveKinematics, 
+            new PIDConstants(0, 0, 0), 
+            new PIDConstants(0, 0, 0), 
+            this::setModuleStates, 
+            eventMap, 
+            useAlliance, 
+            this);
+
+        return builder.fullAuto(pathGroup);
+    }
 
     @Override
     public void periodic() {
@@ -135,15 +173,20 @@ public class SwerveSubsystem extends SubsystemBase {
         field.setRobotPose(getPose());
 
         SmartDashboard.putData(field);
-
         for (SwerveModule mod : swerveMods) {
-            SmartDashboard.putNumber("Module " + mod.moduleID + " Cancoder ", 
-                mod.getCanCoder().getDegrees());
-            SmartDashboard.putNumber("Module " + mod.moduleID + " Integrated ", 
-                mod.getState().angle.getDegrees() % 360);
-            SmartDashboard.putNumber("Module " + mod.moduleID + " Velocity ", 
-                mod.getState().speedMetersPerSecond);
-            mod.canCoderTelemtry();
+            mod.Telemtry();
         }
+
+        SmartDashboard.putNumber("Swerve/Chassis/Gyro/Yaw", getYaw().getDegrees());
+        SmartDashboard.putNumber("Swerve/Chassis/Gyro/Pitch", gyro.getPitch());
+        SmartDashboard.putNumber("Swerve/Chassis/Gyro/Roll", gyro.getRoll());
+
+        SmartDashboard.putNumber("Swerve/Chassis/X", getPose().getX());
+        SmartDashboard.putNumber("Swerve/Chassis/Y", getPose().getY());
+        SmartDashboard.putNumber("Swerve/Chassis/Rotation", getPose().getRotation().getDegrees());
+
+        SmartDashboard.putNumber("Swerve/Chassis/Speed/X", getChassisSpeeds().vxMetersPerSecond);
+        SmartDashboard.putNumber("Swerve/Chassis/Speed/Y", getChassisSpeeds().vyMetersPerSecond);
+        SmartDashboard.putNumber("Swerve/Chassis/Speed/Rot", getChassisSpeeds().omegaRadiansPerSecond);
     }
 }

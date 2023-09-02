@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.libs.config.SwerveModuleConstraints;
 import frc.libs.math.OnboardModuleState;
-import frc.robot.Robot;
 import frc.robot.Constants.Swerve;
 
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
@@ -40,12 +39,15 @@ public class SwerveModule {
 
     private final SimpleMotorFeedforward feedForward;
 
+    private SwerveModuleState desiredState;
+
     public SwerveModule(int moduleID, SwerveModuleConstraints moduleConstants) {
         this.moduleID = moduleID;
         angleOffset = moduleConstants.angleOffset;
+        desiredState = new SwerveModuleState();
 
         angleEncoder = new CANCoder(moduleConstants.cancoderID);
-        configPosition(angleEncoder, -moduleConstants.angleOffset.getDegrees());
+        configPosition(angleEncoder, -angleOffset.getDegrees());
 
         driveMotor = new CANSparkMax(moduleConstants.driveMotorID, 
             MotorType.kBrushless);
@@ -63,7 +65,7 @@ public class SwerveModule {
             Swerve.driveKV, 
             Swerve.driveKA);
 
-        lastAngle = getState().angle;
+        lastAngle = getActualState().angle;
 
         Timer.delay(1);
         resetToAbsolute();
@@ -71,6 +73,7 @@ public class SwerveModule {
 
     private void configureDriveMotor() {
         driveMotor.restoreFactoryDefaults();
+        driveMotor.clearFaults();
 
         driveMotor.setSmartCurrentLimit(Swerve.driveContinuousCurrentLimit);
         driveMotor.enableVoltageCompensation(Swerve.voltageComp);
@@ -94,6 +97,7 @@ public class SwerveModule {
 
     private void configureAzimuthMotor() {
         azimuthMotor.restoreFactoryDefaults();
+        azimuthMotor.clearFaults();
 
         azimuthMotor.setSmartCurrentLimit(Swerve.azimuthContinuousCurrentLimit);
         azimuthMotor.enableVoltageCompensation(Swerve.voltageComp);
@@ -116,12 +120,6 @@ public class SwerveModule {
         resetToAbsolute(); 
     }
 
-    // private void configureAngleEncoder() {
-    //     angleEncoder.configFactoryDefault();
-
-    //     angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
-    // }
-
     private void configPosition (CANCoder encoder, double offset) {
         encoder.configFactoryDefault();
         encoder.configMagnetOffset(offset);
@@ -131,8 +129,6 @@ public class SwerveModule {
       }
 
     public void resetToAbsolute() {
- //       double absolutePosition = getCanCoder().getDegrees(); //- angleOffset.getDegrees();
-
         REVLibError error = azimuthEncoder.setPosition(angleEncoder.getAbsolutePosition());
         SmartDashboard.putString(moduleID+"/RESET", error.toString());
     }
@@ -164,10 +160,11 @@ public class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = OnboardModuleState.optimize(desiredState, getState().angle);
+        desiredState = OnboardModuleState.optimize(desiredState, getActualState().angle);
 
         setSpeed(desiredState, isOpenLoop);
         setAngle(desiredState);
+        desiredState = new SwerveModuleState();
     }
 
     public Rotation2d getAngle() {
@@ -178,19 +175,54 @@ public class SwerveModule {
         return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition());
     }
 
-    public SwerveModuleState getState() {
-        return new SwerveModuleState(driveEncoder.getVelocity(), getAngle());
-    }
-
     public double getDriveEncoderPosition() {
         return driveEncoder.getPosition();
     }
 
-    public void canCoderTelemtry() {
+    public SwerveModuleState getDesiredState() {
+        return desiredState;
+    }
 
-        SmartDashboard.putNumber(moduleID + "/CANCODER/ABSPOS", angleEncoder.getAbsolutePosition());
-        SmartDashboard.putNumber(moduleID + "/CANCODER/POS", angleEncoder.getPosition());
-        SmartDashboard.putString(moduleID + "/CANCODER/Error", angleEncoder.getLastError().toString());
+    public SwerveModuleState getActualState() {
+        return new SwerveModuleState(driveEncoder.getVelocity(), getAngle());
+    }
 
+    public void Telemtry() {
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/CanCoder/AbsolutePosition", angleEncoder.getAbsolutePosition());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/CanCoder/Position", angleEncoder.getPosition());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/CanCoder/Velocity", angleEncoder.getVelocity());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/CanCoder/Velocity", angleEncoder.getBusVoltage());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/CanCoder/Firmware", angleEncoder.getFirmwareVersion());
+        SmartDashboard.putString("Swerve/Module"+moduleID+"/CanCoder/Error", angleEncoder.getLastError().toString());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/CanCoder/ID", angleEncoder.getDeviceID());
+
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Drive/PercentOutput", driveMotor.get());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Drive/Temperature", driveMotor.getMotorTemperature());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Drive/OutputDutyCycle", driveMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Drive/OutputCurrent", driveMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Drive/BusVoltage", driveMotor.getBusVoltage());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Drive/Firmware", driveMotor.getFirmwareVersion());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Drive/Position", driveEncoder.getPosition());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Drive/Velocity", driveEncoder.getVelocity());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Drive/ID", driveMotor.getDeviceId());
+        SmartDashboard.putString("Swerve/Module"+moduleID+"/Drive/Error", driveMotor.getLastError().toString());
+
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Azimuth/PercentOutput", azimuthMotor.get());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Azimuth/Temperature", azimuthMotor.getMotorTemperature());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Azimuth/OutputDutyCycle", azimuthMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Azimuth/OutputCurrent", azimuthMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Azimuth/BusVoltage", azimuthMotor.getBusVoltage());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Azimuth/Firmware", azimuthMotor.getFirmwareVersion());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Azimuth/Position", azimuthEncoder.getPosition());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Azimuth/Velocity", azimuthEncoder.getVelocity());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Azimuth/ID", driveMotor.getDeviceId());
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/Azimuth/ID", azimuthMotor.getDeviceId());
+        SmartDashboard.putString("Swerve/Module"+moduleID+"/Azimuth/Error", driveMotor.getLastError().toString());
+
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/DesiredStates/Speed", getDesiredState().speedMetersPerSecond);
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/DesiredStates/Angle", getDesiredState().angle.getDegrees());
+
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/ActualStates/Angle", getActualState().speedMetersPerSecond);        
+        SmartDashboard.putNumber("Swerve/Module"+moduleID+"/ActualStates/Angle", getActualState().angle.getDegrees());    
     }
 }
