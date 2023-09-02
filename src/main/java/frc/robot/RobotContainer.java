@@ -22,6 +22,8 @@ public class RobotContainer {
 
         controller = new CommandXboxController(0);
 
+        configureBindings();
+
         robotSwerve.setDefaultCommand(new SwerveCommand(
             robotSwerve, 
             () -> -controller.getLeftY(), 
@@ -29,8 +31,6 @@ public class RobotContainer {
             () -> -controller.getRightX(), 
             () -> Constants.Swerve.fieldRelative
         ));
-
-        configureBindings();
     }
 
     private void configureBindings() {
@@ -48,7 +48,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return robotSwerve.followPathGroup(new HashMap<String, Command>(), true, "straight");
+        return robotSwerve.followPathGroup(new HashMap<String, Command>(), true, "testPath");
     }
 
     public SwerveSubsystem getDrive() {
