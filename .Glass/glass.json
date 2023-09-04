@@ -10,16 +10,37 @@
     },
     "transitory": {
       "SmartDashboard": {
-        "0": {
-          "open": true
-        },
-        "1": {
-          "open": true
-        },
-        "2": {
-          "open": true
-        },
-        "3": {
+        "Swerve": {
+          "Module0": {
+            "Azimuth": {
+              "open": true
+            },
+            "CanCoder": {
+              "open": true
+            },
+            "open": true
+          },
+          "Module1": {
+            "CanCoder": {
+              "open": true
+            }
+          },
+          "Module2": {
+            "Azimuth": {
+              "open": true
+            },
+            "CanCoder": {
+              "open": true
+            }
+          },
+          "Module3": {
+            "Azimuth": {
+              "open": true
+            },
+            "CanCoder": {
+              "open": true
+            }
+          },
           "open": true
         },
         "open": true

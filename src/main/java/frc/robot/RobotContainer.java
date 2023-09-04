@@ -26,15 +26,16 @@ public class RobotContainer {
 
         robotSwerve.setDefaultCommand(new SwerveCommand(
             robotSwerve, 
-            () -> -controller.getLeftY(), 
-            () -> -controller.getLeftX(), 
-            () -> -controller.getRightX(), 
+            () -> controller.getLeftY() * 0.5, 
+            () -> - controller.getLeftX() * 0.5, 
+            () -> - controller.getRightX(), 
             () -> Constants.Swerve.fieldRelative
         ));
     }
 
+
     private void configureBindings() {
-        controller.x().onTrue(new InstantCommand( () -> { 
+        controller.x().whileTrue(new InstantCommand( () -> { 
             robotSwerve.resetModules(); 
         }));
 

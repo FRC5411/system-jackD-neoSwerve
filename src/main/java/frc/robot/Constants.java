@@ -35,7 +35,7 @@ public final class Constants {
             new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, trackWidth / 2.0));
 
-    public static boolean fieldRelative = false;
+    public static boolean fieldRelative = true;
 
     /* Swerve Voltage Compensation */
     public static final double voltageComp = 12.0;
@@ -45,16 +45,16 @@ public final class Constants {
     public static final int driveContinuousCurrentLimit = 80;
 
     /* Angle Motor PID Values */
-    public static final double angleKP = 0.01;
+    public static final double angleKP = 0.005;
     public static final double angleKI = 0.0;
-    public static final double angleKD = 0.0;
+    public static final double angleKD = 0.0;//0.00005;
     public static final double angleKFF = 0.0;
 
     /* Drive Motor PID Values */
     public static final double driveKP = 0.1;
     public static final double driveKI = 0.0;
     public static final double driveKD = 0.0;
-    public static final double driveKFF = 0.0;
+    public static final double driveKFF = 0.002;
 
     /* Drive Motor Characterization Values */
     public static final double driveKS = 0.15;

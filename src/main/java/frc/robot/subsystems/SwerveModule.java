@@ -9,6 +9,7 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -36,6 +37,7 @@ public class SwerveModule {
 
     private final SparkMaxPIDController driveController;
     private final SparkMaxPIDController azimuthController;
+    private final PIDController positionController;
 
     private final SimpleMotorFeedforward feedForward;
 
@@ -64,6 +66,13 @@ public class SwerveModule {
         feedForward = new SimpleMotorFeedforward(Swerve.driveKS, 
             Swerve.driveKV, 
             Swerve.driveKA);
+
+        positionController = new PIDController(
+            Swerve.angleKP, 
+            Swerve.angleKI, 
+            Swerve.angleKD);
+
+        positionController.setTolerance(0);
 
         lastAngle = getActualState().angle;
 
@@ -105,13 +114,17 @@ public class SwerveModule {
         azimuthMotor.setInverted(Swerve.azimuthInvert);
         azimuthMotor.setIdleMode(Swerve.azimuthNeutralMode);
 
-        azimuthEncoder.setPosition(0.0);
+        // azimuthEncoder.setPosition(0.0);
         azimuthEncoder.setPositionConversionFactor(Swerve.azimuthConversionFactor);
 
         azimuthController.setP(Swerve.angleKP);
         azimuthController.setI(Swerve.angleKI);
         azimuthController.setD(Swerve.angleKD);
         azimuthController.setFF(Swerve.angleKFF);
+
+        azimuthController.setPositionPIDWrappingMinInput(0);
+        azimuthController.setPositionPIDWrappingMaxInput(360);
+        azimuthController.setPositionPIDWrappingEnabled(true);
 
         azimuthController.setFeedbackDevice(azimuthEncoder);
 
@@ -156,11 +169,21 @@ public class SwerveModule {
                 : desiredState.angle;
         
         azimuthController.setReference(angle.getDegrees(), ControlType.kPosition);
+        // azimuthMotor.set(
+        //     positionController.calculate(
+        //         angleEncoder.getAbsolutePosition(),
+        //         angle.getDegrees()) + 
+        //         Swerve.angleKFF * 
+        //         Math.signum(positionController.getPositionError()));
         lastAngle = angle;
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
         desiredState = OnboardModuleState.optimize(desiredState, getActualState().angle);
+
+        // desiredState = new SwerveModuleState(
+        //     desiredState.speedMetersPerSecond, 
+        //     InputModulus(desiredState.angle, 0 ,360));
 
         setSpeed(desiredState, isOpenLoop);
         setAngle(desiredState);
@@ -172,7 +195,7 @@ public class SwerveModule {
     }
 
     public Rotation2d getCanCoder() {
-        return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition());
+        return Rotation2d.fromDegrees(360 - angleEncoder.getAbsolutePosition());
     }
 
     public double getDriveEncoderPosition() {
@@ -187,7 +210,12 @@ public class SwerveModule {
         return new SwerveModuleState(driveEncoder.getVelocity(), getAngle());
     }
 
+    public void jyankMeasurementAdjuster() {
+        azimuthEncoder.setPosition(getAngle().getDegrees() % 360);
+    }
+
     public void Telemtry() {
+
         SmartDashboard.putNumber("Swerve/Module"+moduleID+"/CanCoder/AbsolutePosition", angleEncoder.getAbsolutePosition());
         SmartDashboard.putNumber("Swerve/Module"+moduleID+"/CanCoder/Position", angleEncoder.getPosition());
         SmartDashboard.putNumber("Swerve/Module"+moduleID+"/CanCoder/Velocity", angleEncoder.getVelocity());
