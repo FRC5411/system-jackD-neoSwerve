@@ -57,6 +57,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
         field = new Field2d();
         SmartDashboard.putData("Field", field);
+
+        SmartDashboard.putBoolean("Field Oriented", false);
     }
 
     public void swerveDrive(Translation2d translation, double rotation, 
@@ -69,22 +71,29 @@ public class SwerveSubsystem extends SubsystemBase {
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
 
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Swerve.maxSpeed);
+        SmartDashboard.putBoolean("Field Oriented", fieldRelative);
         
         for (SwerveModule mod : swerveMods) {
             mod.setDesiredState(swerveModuleStates[mod.moduleID], isOpenLoop);
         }
     }
 
-    public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Swerve.maxSpeed);
+    // public void setModuleStates(SwerveModuleState[] desiredStates) {
+    //     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Swerve.maxSpeed);
 
-        for (SwerveModule mod : swerveMods) {
-            mod.setDesiredState(desiredStates[mod.moduleID], false);
-        }
-    }
+    //     for (SwerveModule mod : swerveMods) {
+    //         mod.setDesiredState(desiredStates[mod.moduleID], false);
+    //     }
+    // }
 
     public void resetOdometry(Pose2d pose) {
         swerveOdometry.resetPosition(getYaw(), swerveModPoses, pose);
+    }
+
+    public void resetModules() {
+        for (SwerveModule mod :swerveMods) {
+            mod.resetToAbsolute();
+        }
     }
 
     public void zeroGyro() {
@@ -97,8 +106,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public Rotation2d getYaw() {
         return (Swerve.invertGyro) 
-            ? Rotation2d.fromDegrees(360 - gyro.getYaw()) 
-            : Rotation2d.fromDegrees(gyro.getYaw());
+            ? Rotation2d.fromDegrees((360 - gyro.getYaw()) % 360)
+            : Rotation2d.fromDegrees(gyro.getYaw() % 360);
     }
 
     public SwerveModuleState[] getStates() {
@@ -136,5 +145,7 @@ public class SwerveSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Module " + mod.moduleID + " Velocity ", 
                 mod.getState().speedMetersPerSecond);
         }
+
+        SmartDashboard.putNumber("Yaw ", gyro.getYaw());
     }
 }

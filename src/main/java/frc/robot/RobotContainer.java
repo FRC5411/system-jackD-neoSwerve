@@ -28,7 +28,7 @@ public class RobotContainer {
 
         robotSwerve.setDefaultCommand(new SwerveCommand(
             robotSwerve, 
-            () -> controller.getLeftY(), 
+            () -> -controller.getLeftY(), 
             () -> -controller.getLeftX(), 
             () -> -controller.getRightX(), 
             () -> robotCentric.getAsBoolean()
@@ -40,6 +40,11 @@ public class RobotContainer {
     private void configureBindings() {
         zeroGyro.onTrue(new InstantCommand( () -> { 
             robotSwerve.zeroGyro(); 
+        }))
+        .onFalse(new InstantCommand());
+
+        controller.b().onTrue(new InstantCommand( () -> {
+            robotSwerve.resetModules();
         }))
         .onFalse(new InstantCommand());
     }

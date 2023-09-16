@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -12,7 +13,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.libs.config.SwerveModuleConstraints;
-import frc.libs.math.OnboardModuleState;
 import frc.robot.Robot;
 import frc.robot.Constants.Swerve;
 
@@ -105,7 +105,7 @@ public class SwerveModule {
 
         azimuthMotor.burnFlash();
 
-        resetToAbsolute(); 
+        //resetToAbsolute(); 
     }
 
     private void configureAngleEncoder() {
@@ -114,10 +114,12 @@ public class SwerveModule {
         angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
     }
 
-    private void resetToAbsolute() {
+    public void resetToAbsolute() {
         double absolutePosition = getCanCoder().getDegrees() - angleOffset.getDegrees();
 
-        azimuthEncoder.setPosition(absolutePosition);
+        REVLibError a = azimuthEncoder.setPosition(absolutePosition);
+
+        System.out.println(a);
     }
 
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -147,18 +149,18 @@ public class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = OnboardModuleState.optimize(desiredState, getState().angle);
+        desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
 
         setSpeed(desiredState, isOpenLoop);
         setAngle(desiredState);
     }
 
     public Rotation2d getAngle() {
-        return Rotation2d.fromDegrees(azimuthEncoder.getPosition());
+        return Rotation2d.fromDegrees(azimuthEncoder.getPosition() % 360);
     }
 
     public Rotation2d getCanCoder() {
-        return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition());
+        return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition() % 360);
     }
 
     public SwerveModuleState getState() {
