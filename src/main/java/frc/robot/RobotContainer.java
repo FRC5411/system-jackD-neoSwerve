@@ -7,11 +7,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveCommand;
+import frc.robot.subsystems.AutonManager;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class RobotContainer {
 
     private SwerveSubsystem robotSwerve;
+    private AutonManager autonManager;
 
     private CommandXboxController controller;
     
@@ -20,6 +22,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         robotSwerve = new SwerveSubsystem();
+        autonManager = new AutonManager(robotSwerve);
 
         controller = new CommandXboxController(0);
 
@@ -30,7 +33,7 @@ public class RobotContainer {
             robotSwerve, 
             () -> -controller.getLeftY(), 
             () -> -controller.getLeftX(), 
-            () -> -controller.getRightX(), 
+            () -> controller.getRightX(), 
             () -> robotCentric.getAsBoolean()
         ));
 
@@ -50,6 +53,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;
+        return autonManager.followPathCommand("testPath");
     }
 }

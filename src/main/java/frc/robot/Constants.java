@@ -1,6 +1,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.PIDConstants;
 import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -74,11 +75,21 @@ public final class Constants {
     public static final IdleMode azimuthNeutralMode = IdleMode.kCoast;
 
     /* Motor Inverts */
-    public static final boolean driveInvert = true;
+    public static final boolean driveInvert = false;
     public static final boolean azimuthInvert = true;
 
     /* Angle Encoder Invert */
     public static final boolean canCoderInvert = false;
+
+    public static final PIDConstants tranConstants = new PIDConstants(
+      11, 
+      0, 
+      0);
+
+    public static final PIDConstants rotConstants = new PIDConstants(
+      0.0, 
+      0, 
+      0);
 
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */

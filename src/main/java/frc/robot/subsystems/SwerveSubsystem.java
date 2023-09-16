@@ -78,13 +78,13 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
-    // public void setModuleStates(SwerveModuleState[] desiredStates) {
-    //     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Swerve.maxSpeed);
+    public void setModuleStates(SwerveModuleState[] desiredStates) {
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Swerve.maxSpeed);
 
-    //     for (SwerveModule mod : swerveMods) {
-    //         mod.setDesiredState(desiredStates[mod.moduleID], false);
-    //     }
-    // }
+        for (SwerveModule mod : swerveMods) {
+            mod.setDesiredState(desiredStates[mod.moduleID], false);
+        }
+    }
 
     public void resetOdometry(Pose2d pose) {
         swerveOdometry.resetPosition(getYaw(), swerveModPoses, pose);
@@ -148,7 +148,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 mod.getState().speedMetersPerSecond);
         }
 
-        
+
 
         SmartDashboard.putNumber("Yaw ", gyro.getYaw());
     }
