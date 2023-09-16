@@ -105,7 +105,11 @@ public class SwerveModule {
 
         azimuthMotor.burnFlash();
 
-        //resetToAbsolute(); 
+        resetToAbsolute(); 
+    }
+
+    public Rotation2d getCanCoderOffset() {
+        return Rotation2d.fromDegrees(zeroTo360Scope(getCanCoder().getDegrees()));
     }
 
     private void configureAngleEncoder() {
@@ -115,11 +119,17 @@ public class SwerveModule {
     }
 
     public void resetToAbsolute() {
-        double absolutePosition = getCanCoder().getDegrees() - angleOffset.getDegrees();
+        double absolutePosition = zeroTo360Scope(getCanCoder().getDegrees());
 
         REVLibError a = azimuthEncoder.setPosition(absolutePosition);
 
         System.out.println(a);
+    }
+
+    public double zeroTo360Scope(double degrees) {
+        double x = degrees - angleOffset.getDegrees();
+        if (x < 0) x = 360 + x;
+        return x;
     }
 
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {

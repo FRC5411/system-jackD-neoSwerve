@@ -78,7 +78,7 @@ public final class Constants {
     public static final boolean azimuthInvert = true;
 
     /* Angle Encoder Invert */
-    public static final boolean canCoderInvert = true;
+    public static final boolean canCoderInvert = false;
 
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */
