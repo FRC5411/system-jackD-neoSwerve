@@ -62,7 +62,7 @@ public class RobotContainer {
 
         // Align to target
         controller.x().whileTrue(
-            autonManager.alignToTarget(robotVision.getTarget())
+            autonManager.alignToTargetCommand(robotVision.getTarget())
         )
         .whileFalse(new InstantCommand());       
     }

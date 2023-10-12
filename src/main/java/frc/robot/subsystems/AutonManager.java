@@ -48,7 +48,7 @@ public class AutonManager {
         return autoBuilder.fullAuto(trajectory);
     }
 
-    public Command alignToTarget(Pose2d target)
+    public Command alignToTargetCommand(Pose2d target)
     {
         final PathConstraints kPathConstraints = new PathConstraints(2.0, 1.0);
 
@@ -62,6 +62,8 @@ public class AutonManager {
             SmartDashboard.getNumber("/alignToTagCommand/rI", 0.0), 
             SmartDashboard.getNumber("/alignToTagCommand/rD", 0.0)
         );
+
+        System.out.println("/auton/alignToTargetCommand/ Set translation values: " + kTranslationController.getP() + kTranslationController.getI() + kTranslationController.getD());
 
         PathPlannerTrajectory alignTrajectory = PathPlanner.generatePath(
             kPathConstraints,
@@ -116,6 +118,8 @@ public class AutonManager {
             SmartDashboard.getNumber("/alignToTagCommand/rI", 0.0), 
             SmartDashboard.getNumber("/alignToTagCommand/rD", 0.0)
         );
+
+        System.out.println("/auton/goToTargetCommand/ Set translation values: " + kTranslationController.getP() + kTranslationController.getI() + kTranslationController.getD());
 
         PathPlannerTrajectory alignTrajectory = PathPlanner.generatePath(
             kPathConstraints,
