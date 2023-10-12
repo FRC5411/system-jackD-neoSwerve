@@ -3,12 +3,12 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -20,7 +20,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private SwerveModule[] swerveMods;
     private SwerveModulePosition[] swerveModPoses;
-    private SwerveDriveOdometry swerveOdometry;
+    private SwerveDrivePoseEstimator swerveOdometry;
 
     private Pigeon2 gyro;
 
@@ -53,7 +53,7 @@ public class SwerveSubsystem extends SubsystemBase {
         gyro.configFactoryDefault();
         zeroGyro();
 
-        swerveOdometry = new SwerveDriveOdometry(Swerve.swerveKinematics, getYaw(), swerveModPoses);
+        swerveOdometry = new SwerveDrivePoseEstimator(Swerve.swerveKinematics, getYaw(), swerveModPoses, getPose());
 
         field = new Field2d();
         SmartDashboard.putData("Field", field);
@@ -75,6 +75,14 @@ public class SwerveSubsystem extends SubsystemBase {
         
         for (SwerveModule mod : swerveMods) {
             mod.setDesiredState(swerveModuleStates[mod.moduleID], isOpenLoop);
+        }
+    }
+
+    public void driveFromChassisSpeeds(ChassisSpeeds wheelSpeeds) {
+        SwerveModuleState[] swerveModuleStates = Swerve.swerveKinematics.toSwerveModuleStates(wheelSpeeds);
+
+        for (SwerveModule mod : swerveMods) {
+            mod.setDesiredState(swerveModuleStates[mod.moduleID], false);
         }
     }
 
@@ -101,7 +109,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public Pose2d getPose() {
-        return swerveOdometry.getPoseMeters();
+        return swerveOdometry.getEstimatedPosition();
     }
 
     public Rotation2d getYaw() {

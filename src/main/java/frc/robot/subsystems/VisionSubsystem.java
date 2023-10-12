@@ -1,6 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
 
@@ -10,12 +7,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class VisionSubsystem extends SubsystemBase
 {
     private NetworkTable m_limelight = NetworkTableInstance.getDefault().getTable("limelight");
+
+    private Field2d m_limelightField = new Field2d();
 
     private NetworkTableEntry m_tx = m_limelight.getEntry("tx");
     private NetworkTableEntry m_ty = m_limelight.getEntry("ty");
@@ -24,6 +24,8 @@ public class VisionSubsystem extends SubsystemBase
     public VisionSubsystem() 
     {
         m_limelight.getEntry("pipeline").setNumber(0); // Default pipeline
+
+        SmartDashboard.putData(m_limelightField);
     }
 
     @Override
@@ -34,6 +36,17 @@ public class VisionSubsystem extends SubsystemBase
         SmartDashboard.putNumber("/vision/area", getLimelightArea());
 
         SmartDashboard.putNumber("/vision/latency", getLimelightLatency());
+        SmartDashboard.putBoolean("/vision/hasTarget", hasTarget());
+
+        SmartDashboard.putNumber("/vision/estimatedX", getEstimatedPose().getX());
+        SmartDashboard.putNumber("/vision/estimatedY", getEstimatedPose().getY());
+        SmartDashboard.putNumber("/vision/estimatedYawDeg", getEstimatedPose().getRotation().getDegrees());
+
+        SmartDashboard.putNumber("/vision/targetX", getTarget().getX());
+        SmartDashboard.putNumber("/vision/targetY", getTarget().getY());
+
+        m_limelightField.setRobotPose(getEstimatedPose());
+        SmartDashboard.putData(m_limelightField);
     }
 
     public double getLimelightX()
@@ -57,6 +70,15 @@ public class VisionSubsystem extends SubsystemBase
         double cameraLatency = m_limelight.getEntry("cl").getDouble(0.0);
 
         return (tableLatency + cameraLatency) / 1000.0;
+    }
+
+    public boolean hasTarget()
+    {
+        if ( (m_limelight.getEntry("tv").getDouble(0.0)) == 0.0 )
+        {
+            return false;
+        }
+        return true;
     }
 
      public Pose2d getEstimatedPose()

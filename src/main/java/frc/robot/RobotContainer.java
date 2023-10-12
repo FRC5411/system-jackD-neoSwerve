@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveCommand;
 import frc.robot.subsystems.AutonManager;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
 
     private SwerveSubsystem robotSwerve;
+    private VisionSubsystem robotVision;
     private AutonManager autonManager;
 
     private CommandXboxController controller;
@@ -22,6 +24,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         robotSwerve = new SwerveSubsystem();
+        robotVision = new VisionSubsystem();
         autonManager = new AutonManager(robotSwerve);
 
         controller = new CommandXboxController(0);
@@ -50,6 +53,18 @@ public class RobotContainer {
             robotSwerve.resetModules();
         }))
         .onFalse(new InstantCommand());
+
+        // Align then drive to target
+        controller.a().whileTrue(
+            autonManager.goToTargetCommand(robotVision.getTarget())
+        )
+        .whileFalse(new InstantCommand());
+
+        // Align to target
+        controller.x().whileTrue(
+            autonManager.alignToTarget(robotVision.getTarget())
+        )
+        .whileFalse(new InstantCommand());       
     }
 
     public Command getAutonomousCommand() {

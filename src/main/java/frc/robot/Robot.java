@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.libs.config.CTREConfig;
@@ -30,6 +31,15 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+
+    // Init NTs for the alignment PID controller vals
+    SmartDashboard.putNumber("/alignToTagCommand/tP", 0.0);
+    SmartDashboard.putNumber("/alignToTagCommand/tI", 0.0);
+    SmartDashboard.putNumber("/alignToTagCommand/tD", 0.0);
+  
+    SmartDashboard.putNumber("/alignToTagCommand/rP", 0.0);
+    SmartDashboard.putNumber("/alignToTagCommand/rI", 0.0);
+    SmartDashboard.putNumber("/alignToTagCommand/rD", 0.0);
 
     ctreConfigs = new CTREConfig();
     
