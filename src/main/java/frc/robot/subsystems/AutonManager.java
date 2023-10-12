@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Swerve;
 
 public class AutonManager {
-    SwerveSubsystem driveSubsystem;
+    private SwerveSubsystem driveSubsystem;
 
     public AutonManager(SwerveSubsystem driveSubsystem) {
         this.driveSubsystem = driveSubsystem;

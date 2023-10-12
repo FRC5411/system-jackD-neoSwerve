@@ -148,8 +148,6 @@ public class SwerveSubsystem extends SubsystemBase {
                 mod.getState().speedMetersPerSecond);
         }
 
-
-
         SmartDashboard.putNumber("Yaw ", gyro.getYaw());
     }
 }
