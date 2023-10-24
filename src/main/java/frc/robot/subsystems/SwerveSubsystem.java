@@ -14,11 +14,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.libs.Interfaces.SwerveModuleInterface;
 import frc.robot.Constants.Swerve;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-    private SwerveModule[] swerveMods;
+    private SwerveModuleInterface[] swerveMods;
     private SwerveModulePosition[] swerveModPoses;
     private SwerveDriveOdometry swerveOdometry;
 
@@ -27,7 +28,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private Field2d field;
     
     public SwerveSubsystem() {
-        swerveMods = new SwerveModule[] {
+        swerveMods = new SwerveModuleInterface[] {
             new SwerveModule(0, 
                 Swerve.Mod0.constants),
             new SwerveModule(1, 
@@ -73,16 +74,16 @@ public class SwerveSubsystem extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Swerve.maxSpeed);
         SmartDashboard.putBoolean("Field Oriented", fieldRelative);
         
-        for (SwerveModule mod : swerveMods) {
-            mod.setDesiredState(swerveModuleStates[mod.moduleID], isOpenLoop);
+        for (SwerveModuleInterface mod : swerveMods) {
+            mod.setDesiredState(swerveModuleStates[mod.getModuleID()], isOpenLoop);
         }
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Swerve.maxSpeed);
 
-        for (SwerveModule mod : swerveMods) {
-            mod.setDesiredState(desiredStates[mod.moduleID], false);
+        for (SwerveModuleInterface mod : swerveMods) {
+            mod.setDesiredState(desiredStates[mod.getModuleID()], false);
         }
     }
 
@@ -91,7 +92,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void resetModules() {
-        for (SwerveModule mod :swerveMods) {
+        for (SwerveModuleInterface mod :swerveMods) {
             mod.resetToAbsolute();
         }
     }
@@ -113,16 +114,16 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveModuleState[] getStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
 
-        for (SwerveModule mod : swerveMods) {
-            states[mod.moduleID] = mod.getState();
+        for (SwerveModuleInterface mod : swerveMods) {
+            states[mod.getModuleID()] = mod.getState();
         }
 
         return states;
     }
 
     public SwerveModulePosition[] getPositions() {
-        for (SwerveModule mod : swerveMods) {
-            swerveModPoses[mod.moduleID] = new SwerveModulePosition(
+        for (SwerveModuleInterface mod : swerveMods) {
+            swerveModPoses[mod.getModuleID()] = new SwerveModulePosition(
                 mod.getDriveEncoderPosition(), 
                 mod.getAngle());
         }
@@ -137,18 +138,16 @@ public class SwerveSubsystem extends SubsystemBase {
 
         SmartDashboard.putData(field);
 
-        for (SwerveModule mod : swerveMods) {
-            SmartDashboard.putNumber("Module " + mod.moduleID + " Cancoder ", 
+        for (SwerveModuleInterface mod : swerveMods) {
+            SmartDashboard.putNumber("Module " + mod.getModuleID() + " Cancoder ", 
                 mod.getCanCoder().getDegrees());
-            SmartDashboard.putNumber("Module " + mod.moduleID + " Cancoder Offset ", 
+            SmartDashboard.putNumber("Module " + mod.getModuleID() + " Cancoder Offset ", 
                 mod.getCanCoderOffset().getDegrees());
-            SmartDashboard.putNumber("Module " + mod.moduleID + " Integrated ", 
+            SmartDashboard.putNumber("Module " + mod.getModuleID() + " Integrated ", 
                 mod.getState().angle.getDegrees());
-            SmartDashboard.putNumber("Module " + mod.moduleID + " Velocity ", 
+            SmartDashboard.putNumber("Module " + mod.getModuleID() + " Velocity ", 
                 mod.getState().speedMetersPerSecond);
         }
-
-
 
         SmartDashboard.putNumber("Yaw ", gyro.getYaw());
     }

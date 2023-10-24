@@ -12,12 +12,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.libs.Interfaces.SwerveModuleInterface;
 import frc.libs.config.SwerveModuleConstraints;
 import frc.robot.Robot;
 import frc.robot.Constants.Swerve;
 
-public class SwerveModule {
-
+public class SwerveModule implements SwerveModuleInterface{
     public int moduleID;
 
     private Rotation2d lastAngle;
@@ -179,5 +179,9 @@ public class SwerveModule {
 
     public double getDriveEncoderPosition() {
         return driveEncoder.getPosition();
+    }
+
+    public int getModuleID() {
+        return moduleID;
     }
 }
