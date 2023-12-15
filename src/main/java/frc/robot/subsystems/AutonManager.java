@@ -7,6 +7,7 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Swerve;
 
@@ -20,6 +21,8 @@ public class AutonManager {
     public Command followPathCommand(String path) {
         List<PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup(path, 
             PathPlanner.getConstraintsFromPath(path));
+
+        driveSubsystem.setFieldTrajectory(PathPlanner.loadPath(path, PathPlanner.getConstraintsFromPath(path)), path);
 
         SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
             driveSubsystem::getPose, 

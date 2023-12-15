@@ -2,6 +2,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -73,17 +74,16 @@ public class SwerveSubsystem extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Swerve.maxSpeed);
         SmartDashboard.putBoolean("Field Oriented", fieldRelative);
         
-        for (SwerveModule mod : swerveMods) {
+        for (SwerveModule mod : swerveMods) 
             mod.setDesiredState(swerveModuleStates[mod.moduleID], isOpenLoop);
-        }
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Swerve.maxSpeed);
 
-        for (SwerveModule mod : swerveMods) {
+        for (SwerveModule mod : swerveMods) 
             mod.setDesiredState(desiredStates[mod.moduleID], false);
-        }
+        
     }
 
     public void resetOdometry(Pose2d pose) {
@@ -91,9 +91,9 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void resetModules() {
-        for (SwerveModule mod :swerveMods) {
+        for (SwerveModule mod : swerveMods) 
             mod.resetToAbsolute();
-        }
+        
     }
 
     public void zeroGyro() {
@@ -130,6 +130,10 @@ public class SwerveSubsystem extends SubsystemBase {
         return swerveModPoses;
     }
 
+    public void setFieldTrajectory(PathPlannerTrajectory traj, String name) {
+        field.getObject(name).setTrajectory(traj);
+    }
+
     @Override
     public void periodic() {
         swerveOdometry.update(getYaw(), getPositions());
@@ -147,8 +151,6 @@ public class SwerveSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Module " + mod.moduleID + " Velocity ", 
                 mod.getState().speedMetersPerSecond);
         }
-
-
 
         SmartDashboard.putNumber("Yaw ", gyro.getYaw());
     }

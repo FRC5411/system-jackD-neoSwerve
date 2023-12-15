@@ -47,7 +47,7 @@ public final class Constants {
     public static final double angleKP = 0.035;
     public static final double angleKI = 0.0;
     public static final double angleKD = 0.0;
-    public static final double angleKFF = 0.0001; //0.0025;
+    public static final double angleKFF = 0.00035; //0.0025;
 
     /* Drive Motor PID Values */
     public static final double driveKP = 0.1;
@@ -83,13 +83,13 @@ public final class Constants {
 
     public static final PIDConstants tranConstants = new PIDConstants(
       11, 
-      0, 
-      0);
+      0.0, 
+      0.0);
 
     public static final PIDConstants rotConstants = new PIDConstants(
+      0.55, 
       0.0, 
-      0, 
-      0);
+      0.002);
 
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */
